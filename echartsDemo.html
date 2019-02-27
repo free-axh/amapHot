@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+  <title>下属行政区查询</title>
+  <link rel="stylesheet" href="https://a.amap.com/jsapi_demos/static/demo-center/css/demo-center.css"/>
+  <style type="text/css">
+    #container, #content{
+      /*height:100%;*/
+      width: 600px;
+      height: 400px;
+      display: inline-block;
+      border: 1px solid #cccccc;
+    }
+  </style>
+</head>
+<body>
+<div id="container"></div>
+</div>
+<div>
+  <button id="cityHot">地级市</button>
+  <button id="districtHot">区县</button>
+</div>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.13&key=59ba5e8427f215f33f359b196119a1e2&plugin=AMap.DistrictSearch"></script>
+<script src="amapHot.js"></script>
+<script type="text/javascript">
+
+  var amapHot =$('#container').amapHot();
+
+  $('#cityHot').on('click', () => {
+    var data = amapHot.returnCityAdcode();
+
+    var adcodeCityObj = [];
+
+    for (var i = 0; i < data.length; i++) {
+      var num = Math.random() * 500;
+      adcodeCityObj.push({
+        adcode: data[i],
+        num: num,
+      });
+    }
+
+    amapHot.districtSearch(adcodeCityObj, 'city');
+
+  });
+
+  $('#districtHot').on('click', () => {
+    var data = amapHot.returnDistrictAdcode();
+    console.log(data);
+
+    var adcodeDistrictObj = [];
+
+    for (var i = 0; i < data.length; i++) {
+      var num = Math.random() * 500;
+      adcodeDistrictObj.push({
+        adcode: data[i],
+        num: num,
+      });
+    }
+
+    amapHot.districtSearch(adcodeDistrictObj, 'district');
+
+  })
+</script>
+<script type="text/javascript" src="https://webapi.amap.com/demos/js/liteToolbar.js"></script>
+
+</body>
+</html>
