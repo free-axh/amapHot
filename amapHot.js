@@ -16,6 +16,7 @@
       adcodeProvinceObj: [], // 省级adcode
       adcodeCityObj: [], // 地级市adcode
       adcodeDistrictObj: [], // 区县adcode
+      adcodeAll: [], // 所有的adcode
       district: null,
       average: null,
       defaultColor: 0xff6600,
@@ -39,7 +40,7 @@
     var southwest = state.mapView.getBounds().getSouthWest(); // 获取西南角坐标
     var northeast = state.mapView.getBounds().getNorthEast(); // 获取东北角坐标
     var path = new AMap.Bounds(southwest, northeast);
-    var arr = state.adcodeDistrictObj.map((key) => {
+    var arr = state.adcodeDistrictObj.map(function(key) {
       var lnglat = [key.lng, key.lat];
       if (path.contains(lnglat)) {
         return key.adcode;
@@ -62,7 +63,7 @@
       state.district.setLevel(value); //行政区级别
       state.district.setExtensions('all');
       //按照adcode进行查询可以保证数据返回的唯一性
-      state.district.search((info.adcode).toString(), ((info) => {
+      state.district.search((info.adcode).toString(), (function(info) {
         return function(status, result) {
           if (status === 'complete') {
             $this._fileArea(result.districtList[0], info.num);
@@ -70,6 +71,21 @@
         }
       })(info));
     }
+  };
+
+  // 根据地级市adcode查询出对应的区县的adcode
+  AMapHot.prototype.searchDistrictAdcode = function(adcode) {
+    var state = this.state;
+    var adcodeStr = adcode.toString();
+    var arr;
+    for (var i = 0; i < state.adcodeAll.length; i++) {
+      var obj = state.adcodeAll[i];
+      if (obj.adcode === adcodeStr) {
+        arr = obj.arr;
+        break;
+      }
+    }
+    return arr;
   };
 
   // 初始化地图
@@ -124,6 +140,7 @@
                 });
                 var optionsThird = secondInfo.districtList;
                 if (optionsSecond !== undefined) {
+                  var adcodeArr = [];
                   for (var s = 0; s < optionsThird.length; s++) {
                     var thirdInfo = optionsThird[s];
                     state.adcodeDistrictObj.push({
@@ -133,15 +150,22 @@
                       lat: thirdInfo.center.lat,
                       name: thirdInfo.name,
                     });
+                    adcodeArr.push(thirdInfo.adcode);
                   }
+                  state.adcodeAll.push(
+                    {
+                      adcode: secondInfo.adcode,
+                      arr: adcodeArr,
+                    }
+                  );
                 }
               }
             }
           }
         }
-        console.log('state.adcodeProvinceObj', state.adcodeProvinceObj);
-        console.log('state.adcodeCityObj', state.adcodeCityObj);
-        console.log('state.adcodeDistrictObj', state.adcodeDistrictObj);
+        // console.log('state.adcodeProvinceObj', state.adcodeProvinceObj);
+        // console.log('state.adcodeCityObj', state.adcodeCityObj);
+        // console.log('state.adcodeDistrictObj', state.adcodeDistrictObj);
       }
     });
   };
@@ -166,8 +190,6 @@
     var state = this.state;
     var times = num / state.average;
     var rand = Math.floor(times * 0x0000ff  + state.defaultColor).toString(16);
-    console.log(times);
-    console.log(rand);
     return '#' + rand;
 
   }
