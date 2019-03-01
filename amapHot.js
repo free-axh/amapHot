@@ -7,6 +7,8 @@
       zoom: 5,
       center: [126.969383, 47.460428],
       districtArea: '黑龙江',
+      mapInit: null,
+      mapZoomChange: null,
     };
 
     this.options = $.extend(defaults, options);
@@ -88,6 +90,12 @@
     return arr;
   };
 
+  // 设置地图层级
+  AMapHot.prototype.setMapZoom = function (zoomIndex) {
+    var options = this.options;
+    options.mapView.setZoom(zoomIndex);
+  };
+
   // 初始化地图
   AMapHot.prototype._initMap = function () {
     var state = this.state;
@@ -101,6 +109,12 @@
         center: options.center,
         zoom: options.zoom,
       });
+      // 地图层级改变后触发事件
+      state.mapView.on('zoomchange', function () {
+        if (options.mapZoomChange) {
+          options.mapZoomChange(state.mapView.getZoom());
+        }
+      })
     }
   };
 
@@ -163,6 +177,7 @@
             }
           }
         }
+        if (options.mapInit) options.mapInit();
         // console.log('state.adcodeProvinceObj', state.adcodeProvinceObj);
         // console.log('state.adcodeCityObj', state.adcodeCityObj);
         // console.log('state.adcodeDistrictObj', state.adcodeDistrictObj);
